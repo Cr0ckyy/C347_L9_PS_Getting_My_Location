@@ -151,7 +151,6 @@ public class MainActivity extends AppCompatActivity {
                         double lat = data.getLatitude();
                         double lng = data.getLongitude();
 
-
                         String msg = "Lat:" + lat + " Lng:" + lng;
                         Toast.makeText(MainActivity.this, msg, Toast.LENGTH_SHORT).show();
                         tvLocation.setText("Last Location:");
