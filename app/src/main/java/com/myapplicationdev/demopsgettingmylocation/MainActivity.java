@@ -142,6 +142,9 @@ public class MainActivity extends AppCompatActivity {
             mLocationRequest.setFastestInterval(5000);
             mLocationRequest.setSmallestDisplacement(500);
 
+
+
+
             mLocationCallback = new LocationCallback() {
                 @Override
                 public void onLocationResult(LocationResult locationResult) {

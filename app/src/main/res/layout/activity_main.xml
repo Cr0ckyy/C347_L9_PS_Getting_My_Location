@@ -49,6 +49,9 @@
             android:layout_weight="1"
             android:text="get location update" />
 
+
+
+
         <Button
             android:id="@+id/btnRemoveLocationUpdate"
             android:layout_width="wrap_content"
