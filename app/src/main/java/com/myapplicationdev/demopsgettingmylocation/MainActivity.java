@@ -56,20 +56,26 @@ public class MainActivity extends AppCompatActivity {
         btnGetLocationUpdate = findViewById(R.id.btnGetLocationUpdate);
         btnRemoveLocationUpdate = findViewById(R.id.btnRemoveLocationUpdate);
         btnCheckRecords = findViewById(R.id.btnCheckRecords);
-
         tvLocation = findViewById(R.id.tvLocation);
         tvLatitude = findViewById(R.id.tvLatitude);
         tvLongitude = findViewById(R.id.tvLongitude);
 
+        // The primary point of contact with the fused location provider.
         FusedLocationProviderClient client = LocationServices.getFusedLocationProviderClient(this);
+        // FragmentManager for interacting with fragments associated with this activity.
         FragmentManager fm = getSupportFragmentManager();
+        // The SupportMapFragment is the simplest way to include a map in an application.
         SupportMapFragment mapFragment = (SupportMapFragment) fm.findFragmentById(R.id.map);
+        // TODO: Folder creation
+        String myFolderLocation = getFilesDir().getAbsolutePath() + "/Folder";
+        // by converting the given pathname string into an abstract pathname,
+        // a new File object is created.
+        File myFolder = new File(myFolderLocation);
 
-        String folderLocation_I = getFilesDir().getAbsolutePath() + "/Folder";
-        File folder_I = new File(folderLocation_I);
+        // checks to see if the file/directory specified by this abstract pathname exists.
+        if (!myFolder.exists()) {
+            boolean result = myFolder.mkdir(); // This function creates the directory specified by the abstract pathname.
 
-        if (!folder_I.exists()) {
-            boolean result = folder_I.mkdir();
             if (result) {
                 Log.d("File Read/Write", "Folder created");
             }
@@ -78,21 +84,25 @@ public class MainActivity extends AppCompatActivity {
         assert mapFragment != null;
         mapFragment.getMapAsync(googleMap -> {
             map = googleMap;
+            map.setMapType(GoogleMap.MAP_TYPE_NORMAL);// sets the map type to be NORMAL
+            checkPermission(); // checking permission
 
-
-            map.setMapType(GoogleMap.MAP_TYPE_NORMAL);
-
-            checkPermission();
-
+            //Returns the most recent location that is currently available in the form of a Task.
             Task<Location> task = client.getLastLocation();
+
             task.addOnSuccessListener(MainActivity.this, location -> {
+
                 if (location != null) {
+
                     tvLocation.setText("Last Location:");
                     tvLatitude.setText(location.getLatitude() + "");
                     tvLongitude.setText(location.getLongitude() + "");
 
+                    // an immutable object storing a pair of latitude and longitude coordinates as degrees
                     downtownCore = new LatLng(location.getLatitude(), location.getLongitude());
+                    // A class that contains methods for creating CameraUpdate objects that change the camera on a map.
                     map.moveCamera(CameraUpdateFactory.newLatLngZoom(downtownCore, 11));
+
                     central = map.addMarker(new MarkerOptions()
                             .position(downtownCore)
                             .title("Last Location")
@@ -101,8 +111,8 @@ public class MainActivity extends AppCompatActivity {
 
                     );
                 } else {
-                    String msg = "No Last Known Location found";
-                    Toast.makeText(MainActivity.this, msg, Toast.LENGTH_SHORT).show();
+                    String toastMsg = "No Last Known Location found";
+                    Toast.makeText(MainActivity.this, toastMsg, Toast.LENGTH_SHORT).show();
 
                 }
             });
@@ -110,21 +120,22 @@ public class MainActivity extends AppCompatActivity {
             map.setOnMarkerClickListener(marker -> {
 
                 Toast.makeText(MainActivity.this, marker.getTitle(), Toast.LENGTH_SHORT).show();
-
-
                 return false;
             });
 
+            // Gets the user interface settings for the map.
             UiSettings ui = map.getUiSettings();
 
-            ui.setCompassEnabled(true);
-            ui.setZoomControlsEnabled(true);
+            ui.setCompassEnabled(true); // Enables  the compass. 
+            ui.setZoomControlsEnabled(true); // Enables the zoom controls
 
-
+            // Determine whether you have been granted a particular permission.
             int permissionCheck = ContextCompat.checkSelfPermission(MainActivity.this, Manifest.permission.ACCESS_FINE_LOCATION);
 
+            // if permission is granted
             if (permissionCheck == PermissionChecker.PERMISSION_GRANTED) {
                 map.setMyLocationEnabled(true);
+                // if permission is NOT granted
             } else {
                 Log.e("Gmap-Permission", "Gps access has not been granted");
                 ActivityCompat.requestPermissions(MainActivity.this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, 0);
@@ -143,8 +154,6 @@ public class MainActivity extends AppCompatActivity {
             mLocationRequest.setSmallestDisplacement(500);
 
 
-
-
             mLocationCallback = new LocationCallback() {
                 @Override
                 public void onLocationResult(LocationResult locationResult) {
@@ -154,8 +163,8 @@ public class MainActivity extends AppCompatActivity {
                         double lat = data.getLatitude();
                         double lng = data.getLongitude();
 
-                        String msg = "Lat:" + lat + " Lng:" + lng;
-                        Toast.makeText(MainActivity.this, msg, Toast.LENGTH_SHORT).show();
+                        String toastMsg = "Latitude:" + lat + " Longitude:" + lng;
+                        Toast.makeText(MainActivity.this, toastMsg, Toast.LENGTH_SHORT).show();
                         tvLocation.setText("Last Location:");
                         tvLatitude.setText(lat + "");
                         tvLongitude.setText(lng + "");
@@ -174,12 +183,12 @@ public class MainActivity extends AppCompatActivity {
                         } else {
                             central.setPosition(newloc);
                             try {
-                                String folderLocation_I1 = getFilesDir().getAbsolutePath() + "/Folder";
-                                File targetFile_I = new File(folderLocation_I1, "location.txt");
-                                FileWriter writer_I = new FileWriter(targetFile_I, true);
-                                writer_I.write(newloc.latitude + "," + newloc.longitude + "\n");
-                                writer_I.flush();
-                                writer_I.close();
+                                String myFolderLocation1 = getFilesDir().getAbsolutePath() + "/Folder";
+                                File myTargetFile = new File(myFolderLocation1, "location.txt");
+                                FileWriter myFileWriter = new FileWriter(myTargetFile, true);
+                                myFileWriter.write(newloc.latitude + "," + newloc.longitude + "\n");
+                                myFileWriter.flush();
+                                myFileWriter.close();
                             } catch (Exception e) {
                                 Toast.makeText(MainActivity.this, "Failed to write!", Toast.LENGTH_LONG).show();
                                 e.printStackTrace();

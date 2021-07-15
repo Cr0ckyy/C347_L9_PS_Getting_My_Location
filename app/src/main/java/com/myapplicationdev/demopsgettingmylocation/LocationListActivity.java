@@ -11,18 +11,15 @@ import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 
-
-
-
-
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 
 public class LocationListActivity extends AppCompatActivity {
+
     Button btnRefresh;
-    TextView tvCount;
-    ListView lvLoc;
+    TextView tvRecords;
+    ListView lvLocations;
 
     @SuppressLint("SetTextI18n")
     @Override
@@ -30,19 +27,23 @@ public class LocationListActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_location_list);
 
-        tvCount = findViewById(R.id.tvRecords);
-        lvLoc = findViewById(R.id.lvLocations);
+        tvRecords = findViewById(R.id.tvRecords);
+        lvLocations = findViewById(R.id.lvLocations);
         btnRefresh = findViewById(R.id.btnRefresh);
 
 
-        String folderLocation_I = getFilesDir().getAbsolutePath() + "/Folder";
-        File targetFile = new File(folderLocation_I, "location.txt");
-        if (targetFile.exists()) {
+        String myFolderLocation = getFilesDir().getAbsolutePath() + "/Folder";
+        File myTargetFile = new File(myFolderLocation, "location.txt");
+
+        if (myTargetFile.exists()) {
             StringBuilder data = new StringBuilder();
+
             try {
-                FileReader reader = new FileReader(targetFile);
+
+                FileReader reader = new FileReader(myTargetFile);
                 BufferedReader br = new BufferedReader(reader);
                 String line = br.readLine();
+
                 while (line != null) {
                     data.append(line).append("\n");
                     line = br.readLine();
@@ -51,9 +52,10 @@ public class LocationListActivity extends AppCompatActivity {
                 String[] array = data.toString().split("\n");
                 ArrayAdapter<String> adapter = new ArrayAdapter<>(this,
                         android.R.layout.simple_list_item_1, android.R.id.text1, array);
-                lvLoc.setAdapter(adapter);
 
-                tvCount.setText("Num of Records: " + array.length);
+                lvLocations.setAdapter(adapter);
+                tvRecords.setText("Number of Records: " + array.length);
+
                 br.close();
                 reader.close();
             } catch (Exception e) {
@@ -65,32 +67,35 @@ public class LocationListActivity extends AppCompatActivity {
         }
 
         btnRefresh.setOnClickListener(v -> {
-            String folderLocation_I1 = getFilesDir().getAbsolutePath() + "/Folder";
-            File targetFile1 = new File(folderLocation_I1, "location.txt");
+            String myFolderLocation1 = getFilesDir().getAbsolutePath() + "/Folder";
+            File myTargetFile1 = new File(myFolderLocation1, "location.txt");
 
-            if (targetFile1.exists()) {
+            if (myTargetFile1.exists()) {
                 StringBuilder data = new StringBuilder();
 
                 try {
-                    FileReader reader = new FileReader(targetFile1);
+                    FileReader reader = new FileReader(myTargetFile1);
                     BufferedReader br = new BufferedReader(reader);
 
                     String line = br.readLine();
+
                     while (line != null) {
                         data.append(line).append("\n");
                         line = br.readLine();
                     }
 
+                    // Split the data after it has been added by adding a new line.
                     String[] array = data.toString().split("\n");
                     ArrayAdapter<String> adapter = new ArrayAdapter<>(getApplicationContext(),
                             android.R.layout.simple_list_item_1, android.R.id.text1, array);
-                    lvLoc.setAdapter(adapter);
 
-                    tvCount.setText("Number of Records: " + array.length);
+                    lvLocations.setAdapter(adapter);
+                    tvRecords.setText("Number of Records: " + array.length);
+
                     br.close();
                     reader.close();
-                } catch (Exception e) {
 
+                } catch (Exception e) {
                     Toast.makeText(LocationListActivity.this, "Failed to read!", Toast.LENGTH_LONG).show();
                     e.printStackTrace();
                 }
